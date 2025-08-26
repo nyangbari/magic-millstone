@@ -11,7 +11,6 @@ async function main(): Promise<void> {
     process.env.MMUSDT_ADDRESS || "YOUR_MMUSDT_ADDRESS";
   const DEPOSIT_AMOUNT: string = process.env.DEPOSIT_AMOUNT || "10";
 
-  // Connect to deployed contracts
   const testUSDT = await ethers.getContractAt("TestUSDT", USDT_ADDRESS);
   const vaultContract = await ethers.getContractAt(
     "VaultContract",
@@ -53,11 +52,10 @@ async function main(): Promise<void> {
   // Step 3: Deposit TestUSDT to get mmUSDT
   console.log("\n3️⃣ Depositing TestUSDT...");
 
-  // Manual gas estimation for reliability
   const gasEstimate = await (vaultContract as any)
     .connect(user)
     .deposit.estimateGas(depositAmount);
-  const gasLimit = (gasEstimate * 120n) / 100n; // 20% buffer
+  const gasLimit = (gasEstimate * 120n) / 100n;
 
   const tx = await (vaultContract as any).connect(user).deposit(depositAmount, {
     gasLimit: gasLimit,
@@ -67,7 +65,6 @@ async function main(): Promise<void> {
   const receipt = await tx.wait();
   console.log("✅ Confirmed in block:", receipt.blockNumber);
 
-  // Parse debug events from deposit transaction
   console.log("\n📝 All transaction logs:");
   console.log(`Total logs: ${receipt.logs.length}`);
   for (let i = 0; i < receipt.logs.length; i++) {
@@ -132,26 +129,6 @@ async function main(): Promise<void> {
     ethers.formatUnits(finalMmUSDTBalance, 6),
     "mmUSDT"
   );
-
-  // Step 5: Show transaction summary
-  console.log("\n📊 Transaction Summary:");
-  const usdtSpent = initialUsdtBalance - finalUsdtBalance;
-  const mmUSDTGained = finalMmUSDTBalance - initialMmUSDTBalance;
-
-  console.log("TestUSDT spent:", ethers.formatUnits(usdtSpent, 6), "USDT");
-  console.log(
-    "mmUSDT received:",
-    ethers.formatUnits(mmUSDTGained, 6),
-    "mmUSDT"
-  );
-  console.log("Exchange rate:", usdtSpent === mmUSDTGained ? "1:1 ✅" : "❌");
-
-  // Step 6: Verify KIP compliance
-  console.log("\n🔍 KIP Compliance:");
-  const kipSupport = await (mmUSDTToken as any).supportsInterface("0x65787371");
-  console.log("mmUSDT KIP-7 support:", kipSupport ? "✅" : "❌");
-
-  console.log("\n✅ Deposit test completed!");
 }
 
 main()

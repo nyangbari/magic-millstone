@@ -13,7 +13,6 @@ async function main(): Promise<void> {
   const VAULT_ADDRESS: string =
     process.env.VAULT_ADDRESS || "YOUR_VAULT_ADDRESS";
 
-  // Connect to deployed contracts
   const testUSDT = await ethers.getContractAt("TestUSDT", USDT_ADDRESS);
   const vaultContract = await ethers.getContractAt(
     "VaultContract",
@@ -52,7 +51,7 @@ async function main(): Promise<void> {
     "USDT"
   );
 
-  // Step 2: Test magicTime - first with static call to see what would happen
+  // Step 2: Test magicTime
   console.log("\n2️⃣ Testing magicTime (static call):");
   try {
     const staticResult = await (vaultContract as any).magicTime.staticCall(
@@ -91,7 +90,6 @@ async function main(): Promise<void> {
     const receipt = await tx.wait();
     console.log("✅ Confirmed in block:", receipt.blockNumber);
 
-    // Get the actual return values from the transaction by calling staticCall after execution
     const actualResult = await (vaultContract as any).magicTime.staticCall(
       bridgeAddress
     );

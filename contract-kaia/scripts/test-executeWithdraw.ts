@@ -16,7 +16,6 @@ async function main() {
     process.exit(1);
   }
 
-  // Connect to contracts
   const vaultContract = await ethers.getContractAt(
     "VaultContract",
     VAULT_ADDRESS
@@ -79,9 +78,8 @@ async function main() {
       return;
     }
 
-    // Get current exchange rate to calculate expected amount
     const exchangeRate = await vaultContract.getExchangeRate();
-    const expectedAmount = BigInt(withdrawRequest.amount) / 1000000n; // Divide by 1e6 (EXCHANGE_RATE_DECIMALS)
+    const expectedAmount = BigInt(withdrawRequest.amount) / 1000000n;
 
     console.log("Exchange rate:", ethers.formatUnits(exchangeRate, 6));
     console.log(

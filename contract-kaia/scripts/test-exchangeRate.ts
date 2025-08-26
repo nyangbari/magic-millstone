@@ -20,11 +20,10 @@ async function main() {
   let currentRate: bigint;
   try {
     currentRate = await vaultContract.getExchangeRate();
-    // Exchange rate is stored with 6 decimals (1e6 = 1.0)
     console.log("Current rate:", ethers.formatUnits(currentRate, 6));
   } catch (error: any) {
     console.log("❌ Error getting exchange rate:", error.message);
-    // Fallback to vault info
+
     const vaultInfo = await vaultContract.getVaultInfo();
     currentRate = vaultInfo[6];
     console.log(
@@ -32,10 +31,7 @@ async function main() {
       ethers.formatUnits(currentRate, 6)
     );
   }
-  console.log("(1.0 = no yield, 1.1 = 10% yield, 1.2 = 20% yield)");
 
-  // Show impact on existing withdrawals
-  console.log("\n💰 Current Withdrawal Situation:");
   const vaultInfo = await vaultContract.getVaultInfo();
   const totalRequested = vaultInfo[5];
   const currentReserves = (totalRequested * currentRate) / BigInt(1000000);
@@ -56,7 +52,6 @@ async function main() {
     "USDT"
   );
 
-  // Test setting a yield rate (1.1 = 10% yield for users)
   const newRate = ethers.parseUnits(NEW_RATE, 6);
   const yieldPercentage = (parseFloat(NEW_RATE) - 1) * 100;
 
@@ -77,7 +72,6 @@ async function main() {
     "USDT"
   );
 
-  // Actually set the new rate (comment out if you don't want to change it)
   try {
     console.log("\n⚙️ Setting 20% yield rate...");
     const tx = await vaultContract.setExchangeRate(newRate);
@@ -86,11 +80,9 @@ async function main() {
     const receipt = await tx.wait();
     console.log("✅ Yield rate updated in block:", receipt.blockNumber);
 
-    // Verify the change
     const updatedRate = await vaultContract.getExchangeRate();
     console.log("Verified new rate:", ethers.formatUnits(updatedRate, 6));
 
-    // Check new required reserves
     const maxTransferable = await vaultContract.getMaxTransferableAmount();
     console.log(
       "Max transferable after yield:",
